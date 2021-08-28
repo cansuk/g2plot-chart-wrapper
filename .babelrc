@@ -1,11 +1,17 @@
 {
-    "plugins": ["@babel/syntax-dynamic-import"],
+    "parserOpts": {
+        "plugins": [
+            "jsx",
+            "flow"
+        ]
+    },
     "presets": [
         [
             "@babel/preset-env",
             {
                 "modules": false
-            }
+            },
+            "@babel/preset-react"
         ]
     ]
 }

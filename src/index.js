@@ -1,3 +1,3 @@
-import Badge from './components/Badge';
 import Button from './components/Button';
-export { Badge, Button };
+import DynamicChart from './components/DynamicChart';
+export { DynamicChart, Button };
