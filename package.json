@@ -1,11 +1,26 @@
 {
   "name": "g2plot-chart-wrapper",
-  "version": "0.1.0",
+  "version": "1.0.0",
+  "description": "A wrapper for AntDesign G2Plot charts. Takes data as json. Binds it on charts and provides configuring settings panel on charts dynamically.",
+  "keywords": [
+    "G2Plot",
+    "charts",
+    "react",
+    "react-charts",
+    "AntDesign",
+    "wrapper",
+    "dynamic-configuration"
+  ],
+  "author": "cansuk",
+  "license": "ISC",
   "private": true,
   "dependencies": {
+    "@babel/preset-env": "^7.15.0",
+    "@babel/preset-react": "^7.14.5",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
+    "@webpack-cli/generators": "^2.3.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-scripts": "4.0.3",
@@ -13,9 +28,13 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "webpack --mode=production --node-env=production",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "build:dev": "webpack --mode=development",
+    "build:prod": "webpack --mode=production --node-env=production",
+    "watch": "webpack --watch",
+    "serve": "webpack serve"
   },
   "eslintConfig": {
     "extends": [
@@ -34,5 +53,13 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@babel/core": "^7.15.0",
+    "babel-loader": "^8.2.2",
+    "html-webpack-plugin": "^5.3.2",
+    "webpack": "^5.51.1",
+    "webpack-cli": "^4.8.0",
+    "webpack-dev-server": "^4.0.0"
   }
 }
