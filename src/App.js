@@ -1,8 +1,8 @@
-import DynamicChart from './components/DynamicChart';
+import DynamicChart from './lib/components/DynamicChart';
 function App() {
   debugger;
   return (
-    <DynamicChart />
+    <div>hello from app js</div>
   );
 }
 

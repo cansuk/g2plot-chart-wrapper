@@ -5,7 +5,7 @@
 
 import React from 'react'
 
-const Setting = () => {
+const Settings = () => {
     return (
         <div>
             hello from setting...
@@ -13,7 +13,7 @@ const Setting = () => {
     )
 }
 
-export default Setting
+export default Settings
 
 
 // import { CloseOutlined, CheckCircleOutlined, SaveOutlined } from "@ant-design/icons";
