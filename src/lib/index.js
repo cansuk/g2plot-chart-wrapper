@@ -1,10 +1,3 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import App from '../App';
-
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+import DynamicChart from './components/DynamicChart';
+import 'antd/dist/antd.css';
+export { DynamicChart };

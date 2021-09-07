@@ -1,5 +1,5 @@
 import DynamicChart from './lib/components/DynamicChart';
-import 'antd/dist/antd.css';
+import './index.css';
 
 import ReactDOM from "react-dom";
 import { StrictMode } from "react";
@@ -13,7 +13,6 @@ ReactDOM.render(
     </StrictMode>,
     rootElement
 );
-
 
 export default { DynamicChart };
 

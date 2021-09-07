@@ -1,3 +1,8 @@
+
+
+
+
+// UTILS INITIALLY -- TODO : DELETE THIS COMMENT
 const randomColor = require('randomcolor');
 
 const GetChartColors = (category, chartObj) => {

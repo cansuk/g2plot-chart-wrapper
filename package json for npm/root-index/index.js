@@ -1,10 +1,11 @@
-import DynamicChart from './lib/components/DynamicChart';
-import 'antd/dist/antd.css';
+import DynamicChart from './src/components/DynamicChart';
+
+import './src/index.css';
 
 import ReactDOM from "react-dom";
 import { StrictMode } from "react";
 
-import App from "./App";
+import App from "./src/App";
 
 const rootElement = document.getElementById("root");
 ReactDOM.render(
@@ -14,6 +15,4 @@ ReactDOM.render(
     rootElement
 );
 
-
-export default { DynamicChart };
-
+export { DynamicChart, Button };
