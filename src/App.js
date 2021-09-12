@@ -1,8 +1,9 @@
-import DynamicChart from './lib/components/DynamicChart';
-import data from './tmp/data';
+import DynamicChartClient from './demo/DynamicChartClient';
+import { data } from './tmp/data';
+
 function App() {
   return (
-    <DynamicChart {...data} />
+    <DynamicChartClient data={data} />
   );
 }
 
