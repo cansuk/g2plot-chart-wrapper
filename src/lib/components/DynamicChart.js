@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Bar } from '@antv/g2plot';
-import { Chart } from '@antv/g2';
-import BarChart from '@ant-design/charts/es/plots/bar';
-import Container from './Container';
-import ReactDOM from "react-dom";
-import { StrictMode } from "react";
+import { Bar, Line } from '@antv/g2plot';
+import { Button, Row, notification } from "antd";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCog, faDownload } from '@fortawesome/free-solid-svg-icons';
+import Settings from './Settings';
+
 
 const randomColor = require('randomcolor');
 
@@ -20,10 +20,13 @@ const DynamicChart = (props) => {
 
     /** VARIABLES */
     const [state, setState] = useState({
+        showSettings: false,
         dataWith1Numeric: [], dataWith1String: [], numericColumnNames: []
     });
     let chartData = [];
     const seriesField_with1numeric = "category";
+
+
     const initialBarConfig = {
         data: [],
         isGroup: true,
@@ -147,7 +150,7 @@ const DynamicChart = (props) => {
         }
 
         return obj;
-    }
+    };
     const GetChartGeometry = (category, chartObj) => chartObj?.filter(x => x.Path === category)[0]?.geomType || "line";
     const GetChartColors = (category, chartObj) => {
         return chartObj?.filter(x => x.Path === category)[0]?.color || randomColor();
@@ -156,7 +159,119 @@ const DynamicChart = (props) => {
         const items = data.filter(x => x[type] === text);
         return items.length ? (items.reduce((a, b) => a + b.value, 0) / items.length).toFixed(1) : '-'
     };
+    let SetObjColor = (selectedKeys) => {
+        // sets color to object and returns it back
+        let index, existingColor, newColor = randomColor();
+        let promise = new Promise((resolve, reject) => {
+            let result = chartRefs.current.numericColumnsFiltered?.map((column) => {
+                index = chartRefs.current.chartObject.findIndex(x => x.Path === column.Path);
+                existingColor = chartRefs.current.chartObject[index]?.color;
 
+                if (!existingColor) {
+                    settings = ColorAddUpdate(settings, column.Path, newColor);
+                    return Object.assign({}, column, { color: newColor });
+                } else {
+                    settings?.colNameColor?.forEach((item, index) => {
+                        if (!selectedKeys.includes(item.colName)) {
+                            // Kaldırılan kolonun rengi de kaldırılmalı :
+                            settings.colNameColor.splice(index, 1);
+                        }
+                    });
+                    return Object.assign({}, column, { color: existingColor });
+                }
+            });
+
+            resolve(result);
+
+        });
+        return promise;
+    };
+    let SetObjGeom = (selectedKeys) => {
+        // sets geometry to object and returns it back
+        let index, existingGeom, newGeom = "line"
+        let promise = new Promise((resolve, reject) => {
+            if (chartRefs.current.chartObject?.length === 0) reject("hata");
+
+            let result = chartRefs.current.numericColumnsFiltered?.map((column) => {
+                index = chartRefs.current.chartObject.findIndex(x => { return x && x.Path === column.Path });
+                existingGeom = chartRefs.current.chartObject[index]?.geometry;
+
+                if (!existingGeom) {
+                    settings = GeomAddUpdate(settings, column.Path, newGeom);
+                    return Object.assign({}, column, { geometry: newGeom });
+                } else {
+                    settings?.colNameGeom?.forEach((item, index) => {
+                        if (!selectedKeys.includes(item.colName)) {
+                            // Kaldırılan kolonun geometrisi de kaldırılmalı :
+                            settings.colNameGeom.splice(index, 1);
+                        }
+                    })
+
+                    return Object.assign({}, column, { geometry: existingGeom });
+                }
+            });
+            resolve(result);
+
+        });
+        return promise;
+    };
+
+    /** CONFIG COMMONS */
+    const legendStyle = {
+        fill: 'black', fontSize: 18,
+        shadowColor: '#C0C0C0',
+        shadowBlur: 10
+    }
+    const xAxisNum = () => chartRefs.current.chartSettings.axisVisibility["xAxis"] ? {
+        title: { text: chartRefs.current.chartSettings.axisTitle["xAxis"] },
+        grid: {
+            line: {
+                style: {
+                    stroke: GetAxisColor(chartRefs.current.chartSettings.axisLineColor, "xAxis"),//chartRefs.current.axisLineColor["xAxis"],
+                    lineWidth: chartRefs.current.chartSettings.axisLineWidth["xAxis"],
+                    lineDash: chartRefs.current.chartSettings.axisLineShape["xAxis"] === "line" ? null : [4, 5],
+                    strokeOpacity: 0.7,
+                    shadowColor: 'black',
+                    shadowBlur: 0,
+                    cursor: 'pointer'
+                }
+            },
+        }
+    } : {};
+    const yAxisNum = () => chartRefs.current.chartSettings.axisVisibility["yAxis"] ? {
+        title: { text: chartRefs.current.chartSettings.axisTitle["yAxis"] },
+        grid: {
+            line: {
+                style: {
+                    stroke: chartRefs.current.chartSettings.axisLineColor["yAxis"],
+                    lineWidth: chartRefs.current.chartSettings.axisLineWidth["yAxis"],
+                    lineDash: chartRefs.current.chartSettings.axisLineShape["yAxis"] === "line" ? null : [4, 5],
+                    strokeOpacity: 0.7,
+                    shadowColor: 'black',
+                    shadowBlur: 0,
+                    cursor: 'pointer'
+                }
+            }
+        }
+    } : {};
+    const GetAxisColor = (axisLineColorData, axis) => axisLineColorData[axis] || randomColor();
+    const GetSliderColor = (chartSettings) => chartSettings?.sliderColor || randomColor();
+    const animationPathIn = {
+        appear: {
+            animation: 'path-in',
+            duration: 5000,
+            delay: 0,
+        },
+    };
+    const animationZoomIn = {
+        appear: {
+            animation: 'zoom-in',
+            duration: 1000,
+            delay: 0,
+        },
+    };
+    /** Other Operations */
+    const [sliderColor, setSliderColor] = useState(GetSliderColor(settings));
     const manipulateData = (dataType) => { // TODO CANSU CONVERT THIS FUNCTION TO PROMISE
 
         state.dataWith1Numeric = []; state.dataWith1String = [];
@@ -288,55 +403,6 @@ const DynamicChart = (props) => {
         }
 
     }
-
-    /** CONFIG COMMONS */
-    const legendStyle = {
-        fill: 'black', fontSize: 18,
-        shadowColor: '#C0C0C0',
-        shadowBlur: 10
-    }
-    const xAxisNum = () => chartRefs.current.chartSettings.axisVisibility["xAxis"] ? {
-        title: { text: chartRefs.current.chartSettings.axisTitle["xAxis"] },
-        grid: {
-            line: {
-                style: {
-                    stroke: GetAxisColor(chartRefs.current.chartSettings.axisLineColor, "xAxis"),//chartRefs.current.axisLineColor["xAxis"],
-                    lineWidth: chartRefs.current.chartSettings.axisLineWidth["xAxis"],
-                    lineDash: chartRefs.current.chartSettings.axisLineShape["xAxis"] === "line" ? null : [4, 5],
-                    strokeOpacity: 0.7,
-                    shadowColor: 'black',
-                    shadowBlur: 0,
-                    cursor: 'pointer'
-                }
-            },
-        }
-    } : {};
-    const yAxisNum = () => chartRefs.current.chartSettings.axisVisibility["yAxis"] ? {
-        title: { text: chartRefs.current.chartSettings.axisTitle["yAxis"] },
-        grid: {
-            line: {
-                style: {
-                    stroke: chartRefs.current.chartSettings.axisLineColor["yAxis"],
-                    lineWidth: chartRefs.current.chartSettings.axisLineWidth["yAxis"],
-                    lineDash: chartRefs.current.chartSettings.axisLineShape["yAxis"] === "line" ? null : [4, 5],
-                    strokeOpacity: 0.7,
-                    shadowColor: 'black',
-                    shadowBlur: 0,
-                    cursor: 'pointer'
-                }
-            }
-        }
-    } : {};
-    const GetAxisColor = (axisLineColorData, axis) => axisLineColorData[axis] || randomColor();
-    const GetSliderColor = (chartSettings) => chartSettings?.sliderColor || randomColor();
-    const animationPathIn = {
-        appear: {
-            animation: 'path-in',
-            duration: 5000,
-            delay: 0,
-        },
-    };
-
     const manageChartChange = (chartName) => {
         switch (chartName) {
             case "bar":
@@ -417,7 +483,74 @@ const DynamicChart = (props) => {
             case "area":
             case "column":
             case "radar-line":
+                manipulateData("with1Numeric");
+                console.log("dataWith1Numeric.length : " + state.dataWith1Numeric.length);
 
+                chartRefs.current.config = {
+                    data: chartRefs.current.chartSettings.isReverseData ? state.dataWith1Numeric.reverse() : state.dataWith1Numeric,
+                    isGroup: chartRefs.current.chartSettings.isGrouped,
+                    isStack: chartRefs.current.chartSettings.isStack,
+                    isPercent: chartRefs.current.chartSettings.isPercent,
+                    seriesField: seriesField_with1numeric,
+                    label: !chartRefs.current.chartSettings.labelActive ? null : {
+                        style: { fontSize: chartRefs.current.chartSettings.labelFontSize, fill: chartRefs.current.chartSettings.selectedLabelColor },
+                        position: chartRefs.current.chartSettings.labelPosition === 'auto' ? '' : chartRefs.current.chartSettings.labelPosition,
+                        rotate: chartRefs.current.chartSettings.isLabelRotate,
+                    },
+                    theme: "light",
+                    colorField: seriesField_with1numeric,
+                    color: ({ category }) => {
+                        let colorObj = chartRefs.current.chartSettings.colNameColor?.filter(x => x["colName"] === category)
+                            || settings?.colNameColor?.filter(x => x["colName"] === category);
+
+                        let color;
+                        if (colorObj && colorObj?.length === 1 && colorObj[0]) {
+                            color = colorObj[0]["color"];
+                        }
+                        return color || GetChartColors(category, chartRefs.current.chartObject);
+
+                    },
+                    legend: chartRefs.current.chartSettings.legendActive && {
+                        title: chartRefs.current.chartSettings.showChartTitle && chartRefs.current.chartSettings.chartTitle
+                            && { text: chartRefs.current.chartSettings.chartTitle, style: legendStyle },
+                        slidable: true,
+                        position: chartRefs.current.chartSettings.legendPosition,
+                        layout: chartRefs.current.chartSettings.legendLayout,
+                        itemName: {
+                            formatter: (text, item) => `${chartRefs.current.numericColumnsFiltered.filter(x => x.ColumnName === text)[0]?.DisplayName}\nOrt. ${CalcAverageValue(state.dataWith1Numeric, seriesField_with1numeric, text)}`
+                        },
+                    },
+                    autoFit: chartRefs.current.chartSettings.autoFitActive,
+                    width: !chartRefs.current.chartSettings.autoFitActive && chartRefs.current.chartSettings.chartWidth,
+                    height: !chartRefs.current.chartSettings.autoFitActive && chartRefs.current.chartSettings.chartHeight,
+                    tooltip: {
+                        showTitle: chartRefs.current.chartSettings.isTooltipTitleActive,
+                        title: chartRefs.current.chartSettings.isAutoTooltipTitle ? '' : chartRefs.current.chartSettings.customTooltipTitle,
+                        formatter: (item) =>
+                            ({ name: chartRefs.current.numericColumnsFiltered.filter(x => x.ColumnName === item[seriesField_with1numeric])[0]?.DisplayName, value: item["value"] }),
+                        //showCrosshairs: chartRefs.current.chartSettings.showTooltipCrosshairs,
+                        showCrosshairs: true, shared: true,
+                        crosshairs: chartRefs.current.chartSettings.showTooltipCrosshairs ? {
+                            type: chartRefs.current.chartSettings.crosshairDirectionX && chartRefs.current.chartSettings.crosshairDirectionY ? 'xy' : chartRefs.current.chartSettings.crosshairDirectionX ? 'x' : chartRefs.current.chartSettings.crosshairDirectionY ? 'y' : 'xy',
+                            text: { style: { fill: chartRefs.current.chartSettings.selectedCrosshairColor } }
+                        } : {}
+                    },
+                    xAxis: xAxisNum(),
+                    yAxis: yAxisNum(),
+                    smooth: true,
+                    animation: chartName === "column" ? animationZoomIn : animationPathIn,
+                    meta: chartRefs.current.numericColumnsFormat,
+
+                    xField: "stringColForNumeric",
+                    yField: "value",
+                    slider: chartRefs.current.chartSettings.showSlider ? {
+                        start: 0.0,
+                        end: 1,
+                        foregroundStyle: { fill: GetSliderColor(chartRefs.current.chartSettings) },
+                        handlerStyle: { height: 30, highLightFill: 'lightGray', stroke: 'gray' },
+                    } : null,
+                    interactions: [{ type: 'marker-active' }, { type: 'brush' }, { type: 'element-highlight-by-color' }, { type: 'element-link' }],
+                };
                 break;
             case "pie":
             case "donut":
@@ -481,6 +614,78 @@ const DynamicChart = (props) => {
         return promise;
 
     }
+
+    const saveSettings = (settingsObj) => {
+
+        applySettings(settingsObj);
+
+        // dashboardServices.getDashboardMeta().then((result) => {
+        //     let pages = result.Data["pages"];
+        //     if (pages && pages?.length === 1 && pages[0] && pages[0].data && pages[0].data[item]) {
+        //         pages[0].data[item]["chartSettings"] = settingsObj;
+        //     }
+        //     dashboardServices.saveDashboardMeta(result.Data).then((result) => {
+        //         message.info("Ayarlar kaydedildi!");
+        //     }).catch(err => message.error(`Ayarlar kaydedilirken hata oluştu. ${err}`));
+        // });
+    }
+    const showWarnings = (props) => {
+        let { description } = props;
+        notification.warning({
+            message: `Uyarı`,
+            description,
+            placement: 'bottomRight'
+        });
+    }
+    const validateSettings = () => {
+        let promise = new Promise((resolve, reject) => {
+            if (chartRefs.current.selectedChart === "dual-axis" && chartRefs.current.numericColumnsFiltered?.length < 2) {
+                showWarnings({
+                    title: "İşlem başarısız",
+                    description: "Çift eksenli grafiğin kullanılabilmesi için minimum 2 değer kolonu seçilmelidir."
+                });
+                resolve(false);
+            } else {
+                resolve(true);
+            }
+        });
+        return promise;
+    }
+    const applySettings = (settingsObj) => {
+        validateSettings().then((result) => {
+            if (result) {
+                // sync new settings : 
+                syncSettings(settingsObj).then((result) => {
+                    if (result) {
+                        manageChartChange(chartRefs.current.selectedChart);
+                        setState({ ...state, showSettings: false });
+                    }
+                });
+            }
+        });
+    }
+    const handleNumFieldChange = (selectedKeys) => {
+
+        chartRefs.current.numericColumnsFiltered = chartRefs.current.numericColumns?.filter(x => selectedKeys.includes(x.ColumnName));
+        if (chartRefs.current.selectedChart !== "dual-axis") {
+            chartRefs.current.chartObject = SetObjColor(selectedKeys).then((result) => result);
+        } else {
+            SetObjColor(selectedKeys).then((result) => {
+                chartRefs.current.chartObject = result;
+                SetObjGeom(selectedKeys).then((result) => {
+                    chartRefs.current.chartObject = result;
+                })
+            });
+        }
+
+        if (chartRefs.current.selectedChart === "dual-axis" && selectedKeys?.length < 2) {
+            showWarnings({
+                description: "Çift eksenli grafiğin kullanılabilmesi için minimum 2 değer kolonu seçilmelidir.",
+            });
+            return;
+        }
+    }
+
     const initChart = ({ columns, dataList }) => {
         chartData = dataList;
         chartRefs.current.numericColumns = columns.filter(x => (!x.PrimaryKey && x.DataTypeName.toLocaleLowerCase().includes("double") && x.ViewEditor.TypeName !== "LookUp") ||
@@ -550,51 +755,121 @@ const DynamicChart = (props) => {
     }
 
     useEffect(() => {
-        console.log("!!! BAR RENDER NOW.... state.isInit is :");
-        console.log(chartRefs.current.isInit);
-        console.log("data length : ");
-        console.log(chartRefs.current.config.data);
+        debugger;
         if (chartRefs.current.isInit && chartRefs.current.config.data.length > 0) {
-            const bar = new Bar('containerCansu', chartRefs.current.config);
-            bar.render();
+            switch (chartRefs.current.selectedChart) {
+                case "bar":
+                    const bar = new Bar('containerCansu', chartRefs.current.config);
+                    bar.render();
+                    break;
+                case "line":
+                    const line = new Line('containerCansu', chartRefs.current.config);
+                    line.render();
+                    break;
+
+            }
+
         }
     }, [chartRefs.current.isInit, chartRefs.current.config.data]);
 
-    const ChartRenderer = () => {
-        switch (chartName) {
-            case "bar":
-                const bar = new Bar('containerCansu', chartRefs.current.config);
-                bar.render();
-                return <></>
-            // return <div id="containerCansu"> {new Bar('containerCansu', chartRefs.current.config).render()}</div>
-            // case "radial-bar":
-            //     return <RadialBar {...chartRefs.current.config} chartRef={ref} />;
-            // case "line":
-            //     return <Line {...chartRefs.current.config} chartRef={ref} />;
-            // case "area":
-            //     return <Area {...chartRefs.current.config} chartRef={ref} />;
-            // case "column":
-            //     return <Column {...chartRefs.current.config} chartRef={ref} />;
-            // case "radar-line":
-            //     return <Radar {...chartRefs.current.config} chartRef={ref} />;
-            // case "pie":
-            // case "donut":
-            //     return state.dataWith1String.length > 0 && <Pie {...chartRefs.current.config} chartRef={ref} />;
-            // case "dual-axis":
-            //     return state.dataWith1String.length > 0 && isInit && isGeometryOptionsReady && isSync && <DualAxes {...chartRefs.current.config} chartRef={ref} />;
-            // case "bidirectional-bar-chart-horizontal":
-            // case "bidirectional-bar-chart-vertical":
-            //     return state.dataWith1String.length > 0 && <BidirectionalBar {...chartRefs.current.config} chartRef={ref} />;
-            // case "rose":
-            //     return <Rose  {...chartRefs.current.config} chartRef={ref} />;
-
-        }
-    }
-
     return (
+        <>
+            <div id="dynamicChartContainer" />
+            <Row>
+                <Button type="default" onClick={() => { alert("download img") }} style={{ marginRight: 24 }}>
+                    <FontAwesomeIcon icon={faDownload} size="lg" pull="left" />  Resmini indir
+                </Button>
+                <Button type="default" onClick={() => setState({ ...state, showSettings: true })} style={{ marginRight: 24 }}>
+                    <FontAwesomeIcon icon={faCog} size="lg" pull="left" /> Ayarlar
+                </Button>
+            </Row>
 
-        <div id="dynamicChartContainer" />
-
+            {state.showSettings && <Settings
+                settingsObj={settings}
+                onSaveChartSettings={saveSettings}
+                isVisible={state.showSettings} selectedChart={chartRefs.current.selectedChart} strKey={chartRefs.current.strKey} strColumns={chartRefs.current.strColumns}
+                numericColumns={chartRefs.current.numericColumns}
+                numericColumnsFiltered={chartRefs.current.numericColumnsFiltered}
+                handleSelectedChart={(value) => {
+                    chartRefs.current.selectedChart = value;
+                    chartRefs.current.chartSettings.labelActive = (value === "pie" || value === "donut");
+                    chartRefs.current.chartSettings.axisVisibility["xAxis"] = (value === "radar-line");
+                    chartRefs.current.chartSettings.axisVisibility["yAxis"] = (value === "radar-line");
+                }}
+                handleStrFieldMenuClick={(item) => { chartRefs.current.strKey = item.key; }}
+                applySettings={applySettings} onClose={() => { setState({ showSettings: false }) }}
+                handleNumFieldChange={handleNumFieldChange}
+                isReverseData={chartRefs.current.chartSettings.isReverseData}
+                handleReverseData={(checked) => chartRefs.current.chartSettings.isReverseData = checked}
+                chartObject={chartRefs.current.chartObject}
+                strKey={chartRefs.current.strKey}
+                sliderColor={sliderColor}
+                showSlider={chartRefs.current.chartSettings.showSlider}
+                handleSliderShowCheck={(checked) => chartRefs.current.chartSettings.showSlider = checked}
+                handleSliderColorChange={(color) => setSliderColor(color.hex)}
+                axisVisibility={chartRefs.current.chartSettings.axisVisibility}
+                axisLineColor={chartRefs.current.chartSettings.axisLineColor}
+                axisLineShape={chartRefs.current.chartSettings.axisLineShape}
+                axisLineWidth={chartRefs.current.chartSettings.axisLineWidth}
+                axisTitle={chartRefs.current.chartSettings.axisTitle}
+                handleAxisTitle={(value) => chartRefs.current.chartSettings.axisTitle[chartRefs.current.selectedAxis] = value}
+                handleAxisLineWidth={(value, selectedAxis) => chartRefs.current.chartSettings.axisLineWidth[selectedAxis] = value}
+                handleAxisColorChange={(color, selectedAxis) => { chartRefs.current.chartSettings.axisLineColor[selectedAxis] = color.hex; }}
+                handleAxisShowCheck={(checked, selectedAxis) => { chartRefs.current.chartSettings.axisVisibility[selectedAxis] = checked }}
+                handleLineTypeSelect={(key, selectedAxis) => { chartRefs.current.chartSettings.axisLineShape[selectedAxis] = key; }}
+                autoFitActive={chartRefs.current.chartSettings.autoFitActive}
+                handleAutoFitActive={(checked) => chartRefs.current.chartSettings.autoFitActive = checked}
+                chartWidth={chartRefs.current.chartSettings.chartWidth}
+                handleChartWidth={(value) => chartRefs.current.chartSettings.chartWidth = parseInt(value)}
+                chartHeight={chartRefs.current.chartSettings.chartHeight}
+                handleChartHeight={(value) => chartRefs.current.chartSettings.chartHeight = parseInt(value)}
+                labelActive={chartRefs.current.chartSettings.labelActive}
+                labelPosition={chartRefs.current.chartSettings.labelPosition}
+                labelFontSize={chartRefs.current.chartSettings.labelFontSize}
+                isLabelRotate={chartRefs.current.chartSettings.isLabelRotate}
+                handleLabelRotate={(checked) => chartRefs.current.chartSettings.isLabelRotate = checked}
+                handleLabelFontSize={(value) => { chartRefs.current.chartSettings.labelFontSize = parseInt(value); }}
+                handleLabelPosition={(value) => { chartRefs.current.chartSettings.labelPosition = value }}
+                handleLabelActive={(checked) => chartRefs.current.chartSettings.labelActive = checked}
+                labelColor={chartRefs.current.chartSettings.selectedLabelColor}
+                handleLabelColor={(color) => {
+                    chartRefs.current.chartSettings.selectedLabelColor = color.hex;
+                    chartRefs.current.chartSettings.isCustomLabelColor = true
+                }}
+                legendActive={chartRefs.current.chartSettings.legendActive}
+                handleLegendActive={(checked) => chartRefs.current.chartSettings.legendActive = checked}
+                legendPosition={chartRefs.current.chartSettings.legendPosition}
+                handleLegendPosition={(value) => chartRefs.current.chartSettings.legendPosition = value}
+                legendLayout={chartRefs.current.chartSettings.legendLayout}
+                handleLegendLayout={(value) => chartRefs.current.chartSettings.legendLayout = value}
+                isTooltipTitleActive={chartRefs.current.chartSettings.isTooltipTitleActive}
+                handleIsTooltipTitleActive={(checked) => chartRefs.current.chartSettings.isTooltipTitleActive = checked}
+                isAutoTooltipTitle={chartRefs.current.chartSettings.isAutoTooltipTitle}
+                handleIsAutoTooltipTitle={(checked) => chartRefs.current.chartSettings.isAutoTooltipTitle = checked}
+                customTooltipTitle={chartRefs.current.chartSettings.customTooltipTitle}
+                handleCustomTooltipTitle={(value) => chartRefs.current.chartSettings.customTooltipTitle = value}
+                showChartTitle={chartRefs.current.showChartTitle}
+                handleShowChartTitle={(checked) => chartRefs.current.chartSettings.showChartTitle = checked}
+                chartTitle={chartRefs.current.chartSettings.chartTitle}
+                handleChartTitle={(value) => chartRefs.current.chartSettings.chartTitle = value}
+                handleGeomTypeChange={(value, currentColorColName) => {
+                    chartRefs.current.currentGeomType = value;
+                    if (currentColorColName) {
+                        let index = chartRefs.current.chartObject.findIndex(x => x.Path === currentColorColName);
+                        chartRefs.current.chartObject[index].geomType = value;
+                    }
+                }}
+                isGrouped={chartRefs.current.chartSettings.isGrouped}
+                isStacked={chartRefs.current.chartSettings.isStack}
+                isPercent={chartRefs.current.chartSettings.isPercent}
+                selectedDataViewMode={chartRefs.current.chartSettings.selectedDataViewMode}
+                handleDataViewModeChange={(value) => chartRefs.current.chartSettings.selectedDataViewMode = value}
+                dataLimitCount={chartRefs.current.chartSettings.dataLimitCount}
+                handleDataLimitCount={(value) => chartRefs.current.chartSettings.dataLimitCount = value}
+                isAggregate={chartRefs.current.chartSettings.isAggregate}
+                handleIsAggregate={(checked) => chartRefs.current.chartSettings.isAggregate = checked}
+            />}
+        </>
     )
 }
 
