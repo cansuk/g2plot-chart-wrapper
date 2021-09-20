@@ -254,7 +254,7 @@ const Settings = ({ settingsObj, isDashboard, onSaveChartSettings, isVisible, ap
                                 onChange={(value) => {
                                     let settingsIndex = settingRefs.current.settingsObj.colNameGeom.findIndex(x => x["colName"] === currentColorColName);
                                     // TODO CANSU Utils/GeomAddUpdate fonksiyonunu çağırabilirsin.
-                                    if (settingsIndex == -1) {
+                                    if (settingsIndex === -1) {
                                         // add
                                         settingRefs.current.settingsObj.colNameGeom.push({ colName: currentColorColName, geometry: value });
                                     } else {
