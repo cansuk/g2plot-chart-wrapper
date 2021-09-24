@@ -1,22 +1,57 @@
-const ChartTypes = [
+import { Line, Bar, Pie, Area, Column, DualAxes, BidirectionalBar, Radar, RadialBar, Rose } from '@antv/g2plot';
+export const ChartDataType = {
+    bar: "with1Numeric",
+    line: "with1Numeric",
+    area: "with1Numeric",
+    pie: "with1String",
+    donut: "with1String",
+    column: "with1Numeric",
+    dualAxes: "with1String",
+    bidirectionalBarHorizontal: "with1String",
+    bidirectionalBarVertical: "with1String",
+    radarLine: "with1Numeric",
+    radialBar: "with1Numeric",
+    rose: "with1Numeric"
+};
+
+
+export const ChartTypes = [
     "bar",
-    "radial-bar",
+    "radialBar",
     "line",
     "pie",
+    "donut",
     "area",
     "column",
-    "dual-axis",
-    "bidirectional-bar-chart-horizontal",
-    "bidirectional-bar-chart-vertical",
-    "radar-line",
+    "dualAxes",
+    "bidirectionalBarHorizontal",
+    "bidirectionalBarVertical",
+    "radarLine",
+    "rose"
 ];
 
-const ChartAxisLineShapes = [
+
+export const ChartInstanceType = {
+    bar: Bar,
+    line: Line,
+    area: Area,
+    pie: Pie,
+    donut: Pie,
+    column: Column,
+    dualAxes: DualAxes,
+    bidirectionalBarHorizontal: BidirectionalBar,
+    bidirectionalBarVertical: BidirectionalBar,
+    radarLine: Radar,
+    radialBar: RadialBar,
+    rose: Rose,
+}
+
+export const ChartAxisLineShapes = [
     "line",
     "dashedLine",
 ];
 
-const LabelPositionTypes = [
+export const LabelPositionTypes = [
     "auto",
     "top",
     "bottom",
@@ -24,7 +59,7 @@ const LabelPositionTypes = [
     "right",
     "left",
 ];
-const LegendPositionTypes = [
+export const LegendPositionTypes = [
     "top",
     "bottom",
     "left",
@@ -35,17 +70,8 @@ const LegendPositionTypes = [
     "bottom-left"
 ];
 
-const DataViewModes = [
+export const DataViewModes = [
     { name: "group", value: "Grup gösterimi" },
     { name: "stack", value: "Yığın gösterimi" },
     { name: "percent", value: "Yüzdelik gösterim" }
 ]
-
-
-module.exports = {
-    ChartTypes,
-    ChartAxisLineShapes,
-    LabelPositionTypes,
-    LegendPositionTypes,
-    DataViewModes
-}
