@@ -28,7 +28,9 @@ const initialBarConfig = {
 
 const DynamicChart = (props) => {
     // let { templateName, style, dataGridState, onSaveChartSettings, item, settings, isDashboard, chartName, filterCriteria, enableDownload = true, enableSettings = true } = props;
-    let { data, style, chartName, settings } = props;
+    let { style, chartName, settings } = props;
+
+
 
     // TODO CANSU TEST İÇİN EKLENDİ, SİLİNECEK
     if (settings && settings.chartType) {
@@ -43,6 +45,7 @@ const DynamicChart = (props) => {
 
     const chartRefs = useRef({
         chartData: [],
+        data: {},
         chart: null,
         isInit: false, isSync: false, isChartPossible: true,
         config: { ...initialBarConfig, ...style },
@@ -98,6 +101,7 @@ const DynamicChart = (props) => {
             dataLimitCount: 0
         }
     });
+
 
 
     if (!settings) {
@@ -925,18 +929,30 @@ const DynamicChart = (props) => {
     }
 
     useEffect(() => {
-        console.log("useeffect...");
+        console.debug("useeffect...");
         const containerElement = document.getElementById("dynamicChartContainer");
         if (containerElement) {
-            initChart(data);
-            renderChart(chartName);
+            fetch("./data.json").then(
+                function (res) {
+                    return res.json()
+                }).then((data) => {
+                    chartRefs.current.data = data;
+                    initChart(chartRefs.current.data);
+                    renderChart(chartName);
+                }).catch(
+                    (err) => {
+                        // TODO CANSU burdan anlamlı bi şekilde hata döndür.
+                        console.log(err, ' error')
+                    }
+                );
         }
 
         return () => {
             // cleanup
+            // TODO CANSU BUNA GEREK KALMAYABİLİR.
             console.log("cleanup...");
         }
-    }, []);
+    });
 
 
     return (
