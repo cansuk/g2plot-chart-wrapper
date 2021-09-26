@@ -37,7 +37,7 @@ export const ColorAddUpdate = (obj, colName, color) => {
     if (!color) { color = randomColor(); }
     if (!obj.colNameColor) { obj.colNameColor = []; }
     let settingsIndex = obj.colNameColor.findIndex(x => x["colName"] === colName);
-    if (settingsIndex == -1) {
+    if (settingsIndex === -1) {
         // add
         obj.colNameColor.push({ colName: colName, color: color });
     } else {
@@ -51,7 +51,7 @@ export const ColorAddUpdate = (obj, colName, color) => {
 export const GeomAddUpdate = (obj, colName, geom) => {
     if (!obj.colNameGeom) { obj.colNameGeom = []; }
     let settingsIndex = obj.colNameGeom.findIndex(x => x["colName"] === colName);
-    if (settingsIndex == -1) {
+    if (settingsIndex === -1) {
         // add
         obj.colNameGeom.push({ colName: colName, geometry: geom });
     } else {

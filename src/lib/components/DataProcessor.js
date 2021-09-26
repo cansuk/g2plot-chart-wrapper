@@ -1,4 +1,3 @@
-import React, { useRef } from 'react';
 import kindOf from "kind-of";
 
 function DataProcessingException(message) {
@@ -9,7 +8,6 @@ function DataProcessingException(message) {
 const DataProcessor = (data) => {
     let numericColumns = [], strKeys = [];
     const promise = new Promise((resolve, reject) => {
-        // const refs = useRef({ numericColumns: [], strKeys: [] });
 
         if (kindOf(data) === "array") {
             console.log("yes, continue...");

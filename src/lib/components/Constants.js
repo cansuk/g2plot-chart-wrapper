@@ -71,7 +71,7 @@ export const LegendPositionTypes = [
 ];
 
 export const DataViewModes = [
-    { name: "group", value: "Grup gösterimi" },
-    { name: "stack", value: "Yığın gösterimi" },
-    { name: "percent", value: "Yüzdelik gösterim" }
+    { name: "group", value: "Grouped" },
+    { name: "stack", value: "Stacked" },
+    { name: "percent", value: "Percent" }
 ]

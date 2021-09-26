@@ -1,13 +1,13 @@
-import React, { useState, useRef } from 'react';
+import { useState, useRef } from 'react';
 import {
-    Tabs, Drawer, Button, Select, Checkbox, Row, Col, Tooltip, Radio, Collapse, Input, Layout, Space, InputNumber
+    Tabs, Drawer, Button, Select, Checkbox, Row, Col, Tooltip, Radio, Collapse, Input, Space
 } from 'antd';
 import uniqid from 'uniqid';
 // import i18n from '../../i18n';
 
 
 
-import { CloseOutlined, CheckCircleOutlined, SaveOutlined } from "@ant-design/icons";
+import { CloseOutlined, SaveOutlined } from "@ant-design/icons";
 import { SketchPicker } from 'react-color';
 
 const chartTypes = require("./Constants").ChartTypes;
@@ -95,11 +95,11 @@ const Settings = ({ settingsObj, isDashboard, onSaveChartSettings, isVisible, ap
     );
 
     const tabBody =
-        <><TabPane tab="Grafik" key="1">
+        <><TabPane tab="Chart" key="1">
 
             <Row gutter={[8, 8]} justify="center">
                 <Col span={24}>
-                    <h3>Grafik Türü</h3>
+                    <h3>Chart Type</h3>
                 </Col>
                 <Col span={24}>
                     <Select defaultValue={state.selectedChart} style={{ width: "100%" }} onSelect={(value) => {
@@ -117,10 +117,10 @@ const Settings = ({ settingsObj, isDashboard, onSaveChartSettings, isVisible, ap
                     </Select>
                 </Col>
                 <Col span={24} style={{ paddingTop: 30 }}>
-                    <h3>Veriler</h3>
+                    <h3>Data</h3>
                 </Col>
                 <Col span={10} style={styles.verticallyCenteredColStyle}>
-                    <span>Kategori :</span>
+                    <span>Category :</span>
                 </Col>
                 <Col span={14}>
                     <Select defaultValue={state.strKey} style={{ width: "100%" }}
@@ -136,7 +136,7 @@ const Settings = ({ settingsObj, isDashboard, onSaveChartSettings, isVisible, ap
                     </Select>
                 </Col>
                 <Col span={10} style={styles.verticallyCenteredColStyle}>
-                    <span>Değer : </span>
+                    <span>Value : </span>
                 </Col>
                 <Col span={14}>
                     {<Select
@@ -152,9 +152,8 @@ const Settings = ({ settingsObj, isDashboard, onSaveChartSettings, isVisible, ap
                 </Col>
 
                 <Col span={10} style={styles.verticallyCenteredColStyle}>
-                    <Tooltip title={<> <p> Grup gösterimi ve Yığın gösteriminden biri kullanılabilir.</p>
-                        <p>Yüzdelik gösterimin kullanılabilmesi için Grup veya Yığın gösterimi seçilmiş olmalıdır. </p> </>} mouseEnterDelay="0.1">
-                        <span> Veri Gösterim Türü : </span>
+                    <Tooltip title={"Either one of grouped or stacked display can be selected. Once either of them selected, Percentage display will be enabled for selection."} mouseEnterDelay="0.1">
+                        <span> Data display mode : </span>
                     </Tooltip>
                 </Col>
                 <Col span={14}>
@@ -163,7 +162,7 @@ const Settings = ({ settingsObj, isDashboard, onSaveChartSettings, isVisible, ap
                         mode="multiple"
                         allowClear
                         style={{ width: '100%' }}
-                        placeholder="Seçiniz"
+                        placeholder="Select"
                         defaultValue={selectedDataViewMode}
                         onChange={(value) => {
                             settingRefs.current.settingsObj.selectedDataViewMode = value;
@@ -179,19 +178,19 @@ const Settings = ({ settingsObj, isDashboard, onSaveChartSettings, isVisible, ap
                         }}
                     >
                         <Option key={"group"} value={"group"}
-                            disabled={settingRefs.current.settingsObj.isStacked}>{"Grup gösterimi"}</Option>
+                            disabled={settingRefs.current.settingsObj.isStacked}>{"Grouped"}</Option>
                         <Option key={"stack"} value={"stack"}
-                            disabled={settingRefs.current.settingsObj.isGrouped}>{"Yığın gösterimi"}</Option>
+                            disabled={settingRefs.current.settingsObj.isGrouped}>{"Stacked"}</Option>
                         <Option key={"percent"} value={"percent"}
                             disabled={!(settingRefs.current.settingsObj.isStacked || settingRefs.current.settingsObj.isGrouped)}
-                        >{"Yüzdelik gösterimi"}</Option>
+                        >{"Percent"}</Option>
                     </Select>}
 
                 </Col>
 
                 <Col span={10} style={styles.verticallyCenteredColStyle}>
-                    <Tooltip title={<> <p> Gösterilecek kayıt sayısı sınırı. Sınırı kaldırmak için 0 girebilir veya boş bırakabilirsiniz.</p> </>} mouseEnterDelay="0.1">
-                        <span> Veri sınırı : </span>
+                    <Tooltip title={"Data limit count to display. Default is 250.  If you don't want to limit data count, you can enter 0 or leave empty."} mouseEnterDelay="0.1">
+                        <span> Data limit : </span>
                     </Tooltip>
                 </Col>
                 <Col span={14}>
@@ -216,10 +215,10 @@ const Settings = ({ settingsObj, isDashboard, onSaveChartSettings, isVisible, ap
                         setState({ ...state, isReverseData: checked });
                         settingRefs.current.settingsObj.isReverseData = checked;
                         handleReverseData(checked)
-                    }}>Veri sıralamasını tersine çevir</Checkbox>
+                    }}>Reverse data order</Checkbox>
                 </Col>
                 <Col span={24} style={{ paddingTop: 30 }}>
-                    <h3>Grafik Biçimi</h3>
+                    <h3>Chart format</h3>
                 </Col>
                 <Col span={14}>
                     <Select defaultValue={numericColumnsFiltered?.filter(x => x === currentColorColName)[0]} style={{ width: "100%" }}
@@ -246,16 +245,16 @@ const Settings = ({ settingsObj, isDashboard, onSaveChartSettings, isVisible, ap
                 </Col>
 
                 <Col span={10} style={styles.verticallyCenteredColStyle}>
-                    <span> Kolon grafik tipi : </span>
+                    <span> Column shape : </span>
                 </Col>
                 <Col span={14}>
-                    <Tooltip title={"Yalnızca çift eksen tipindeki grafiklerde kullanılabilir. "}>
+                    <Tooltip title={"Available for dual-axis charts only."}>
                         {currentGeomType &&
                             <Select value={GetChartGeometry(currentColorColName, chartObject)} style={{ width: "100%" }} disabled={(state.selectedChart !== "dual-axis")}
                                 onChange={(value) => {
                                     let settingsIndex = settingRefs.current.settingsObj.colNameGeom.findIndex(x => x["colName"] === currentColorColName);
                                     // TODO CANSU Utils/GeomAddUpdate fonksiyonunu çağırabilirsin.
-                                    if (settingsIndex == -1) {
+                                    if (settingsIndex === -1) {
                                         // add
                                         settingRefs.current.settingsObj.colNameGeom.push({ colName: currentColorColName, geometry: value });
                                     } else {
@@ -276,32 +275,32 @@ const Settings = ({ settingsObj, isDashboard, onSaveChartSettings, isVisible, ap
                 <Col span={24}>
                     <h3>Slider</h3>
                 </Col>
-                <Col span={12}>
+                <Col span={24}>
                     <Checkbox defaultChecked={showSlider} onChange={(event) => {
                         const { checked } = event.target;
                         settingRefs.current.settingsObj.showSlider = checked;
                         handleSliderShowCheck(checked);
-                    }}> Slider göster</Checkbox>
+                    }}> Show slider </Checkbox>
                 </Col>
-                <Col span={8} type="flex" align="right" style={styles.verticallyCenteredColStyle}>
-                    <span>Slider Rengi :</span>
-                </Col>
-                <Col span={4} type="flex" align="right" >
+                {/* <Col span={8} type="flex" align="right" style={styles.verticallyCenteredColStyle}>
+                    <span>Slider color :</span>
+                </Col> */}
+                {/* <Col span={4} type="flex" align="right" >
                     {showSlider && <Tooltip title={<SketchPicker color={sliderColor}
                         onChangeComplete={(color) => { settingRefs.current.settingsObj.sliderColor = color.hex; handleSliderColorChange(color); }} />} color="white" trigger={['click']}>
                         <div style={{ width: 40, height: 20, backgroundColor: sliderColor }}></div>
                     </Tooltip>}
-                </Col>
+                </Col> */}
             </Row>
         </TabPane>
-            <TabPane tab="Eksen" key="2">
+            <TabPane tab="Axis" key="2">
                 <Row gutter={[12, 12]}>
                     <Col span={24} type="flex" justify="center" align="middle" >
                         <Radio.Group defaultValue={state.currentAxis} buttonStyle="solid" onChange={(event) => {
                             setState({ ...state, currentAxis: event.target.value });
                         }}>
-                            <Radio.Button value="xAxis">Yatay Eksen</Radio.Button>
-                            <Radio.Button value="yAxis">Dikey Eksen</Radio.Button>
+                            <Radio.Button value="xAxis">Horizontal Axis</Radio.Button>
+                            <Radio.Button value="yAxis">Vertical Axis </Radio.Button>
                         </Radio.Group>
                     </Col>
                     <Col span={24}>
@@ -311,10 +310,10 @@ const Settings = ({ settingsObj, isDashboard, onSaveChartSettings, isVisible, ap
                             setState({ ...state, axisVisibility: state.axisVisibility });
                             settingRefs.current.settingsObj.axisVisibility[state.currentAxis] = checked;
                             handleAxisShowCheck(checked, state.currentAxis);
-                        }}> Eksen çizgisini göster</Checkbox>
+                        }}> Show axis line</Checkbox>
                     </Col>
                     <Col span={10} style={styles.verticallyCenteredColStyle}>
-                        <span>Çizgi türü : </span>
+                        <span>Line type: </span>
                     </Col>
                     {state.currentAxis && <Col span={14}>
                         <Select value={state.axisLineShape[state.currentAxis]} style={{ width: "100%" }} disabled={!state.axisVisibility[state.currentAxis]}
@@ -329,7 +328,7 @@ const Settings = ({ settingsObj, isDashboard, onSaveChartSettings, isVisible, ap
                         </Select>
                     </Col>}
                     <Col span={10} style={styles.verticallyCenteredColStyle}>
-                        <span>  Çizgi kalınlığı : </span>
+                        <span> Line thickness : </span>
                     </Col>
                     {state.currentAxis && <Col span={14}>
                         <Select value={state.axisLineWidth[state.currentAxis]} style={{ width: "100%", textAlign: 'right' }} disabled={!state.axisVisibility[state.currentAxis]}
@@ -344,7 +343,7 @@ const Settings = ({ settingsObj, isDashboard, onSaveChartSettings, isVisible, ap
                         </Select>
                     </Col>}
                     <Col span={10}>
-                        Eksen rengi :
+                        Axis color :
                     </Col>
                     {state.currentAxis && <Col span={14}>
                         <Tooltip title={
@@ -362,7 +361,7 @@ const Settings = ({ settingsObj, isDashboard, onSaveChartSettings, isVisible, ap
 
 
                     <Col span={10} style={styles.verticallyCenteredColStyle}>
-                        <span>Eksen başlığı :</span>
+                        <span>Axis title :</span>
                     </Col>
                     <Col span={14}>
                         <Input value={state.axisTitle[state.currentAxis]}
@@ -378,10 +377,10 @@ const Settings = ({ settingsObj, isDashboard, onSaveChartSettings, isVisible, ap
 
                 </Row>
             </TabPane>
-            <TabPane tab="Görünüm" key="3">
+            <TabPane tab="Appearance" key="3">
 
                 <Collapse defaultActiveKey={['31']} onChange={(key) => { console.log(key) }} style={{ width: "100%" }} >
-                    <Panel header="Başlık" key="31">
+                    <Panel header="Header" key="31">
                         <Row gutter={[8, 8]}>
                             <Col span={24}>
                                 <Checkbox defaultChecked={showChartTitle}
@@ -389,10 +388,10 @@ const Settings = ({ settingsObj, isDashboard, onSaveChartSettings, isVisible, ap
                                         const { checked } = event.target;
                                         settingRefs.current.settingsObj.showChartTitle = checked;
                                         handleShowChartTitle(checked);
-                                    }}> Grafik başlığı gösterilsin </Checkbox>
+                                    }}> Show chart title </Checkbox>
                             </Col>
                             <Col span={10} style={styles.verticallyCenteredColStyle}>
-                                <span>Grafik başlığı :</span>
+                                <span>Chart title :</span>
                             </Col>
                             <Col span={14}>
                                 <Input defaultValue={chartTitle}
@@ -404,7 +403,7 @@ const Settings = ({ settingsObj, isDashboard, onSaveChartSettings, isVisible, ap
                             </Col>
                         </Row>
                     </Panel>
-                    <Panel header="Boyut" key="32">
+                    <Panel header="Dimension" key="32">
                         <Row gutter={[8, 8]}>
                             <Col span={24}>
                                 <Checkbox defaultChecked={autoFitActive}
@@ -413,10 +412,10 @@ const Settings = ({ settingsObj, isDashboard, onSaveChartSettings, isVisible, ap
                                         settingRefs.current.settingsObj.autoFitActive = checked;
                                         setState({ ...state, autoFitActive: checked });
                                         handleAutoFitActive(checked);
-                                    }}> Otomatik boyutlandır</Checkbox>
+                                    }}> Auto dimension </Checkbox>
                             </Col>
                             <Col span={10} style={styles.verticallyCenteredColStyle}>
-                                <span>Genişlik:</span>
+                                <span>Width:</span>
                             </Col>
                             <Col span={14}>
                                 <Input min={200} max={1920} style={{ textAlign: 'right' }} addonAfter={"px"} value={state.chartWidth}
@@ -432,7 +431,7 @@ const Settings = ({ settingsObj, isDashboard, onSaveChartSettings, isVisible, ap
                                     }} />
                             </Col>
                             <Col span={10} style={styles.verticallyCenteredColStyle}>
-                                <span>Yükseklik:</span>
+                                <span>Height:</span>
                             </Col>
                             <Col span={14}>
                                 <Input min={200} max={1920} style={{ textAlign: 'right' }} addonAfter={"px"} value={state.chartHeight}
@@ -449,21 +448,21 @@ const Settings = ({ settingsObj, isDashboard, onSaveChartSettings, isVisible, ap
                             </Col>
                         </Row>
                     </Panel>
-                    <Panel header="Etiket" key="33">
+                    <Panel header="Label" key="33">
                         <Row gutter={[8, 8]}>
                             <Col span={24}>
-                                <Tooltip title="Karşılık gelen verinin grafiğin üzerindeki veri noktalarında görünümünü sağlar." mouseEnterDelay="0.1">
+                                <Tooltip title="Displays all values on chart." mouseEnterDelay="0.1">
                                     <Checkbox defaultChecked={state.labelActive}
                                         onChange={(event) => {
                                             const { checked } = event.target;
                                             settingRefs.current.settingsObj.labelActive = checked;
                                             setState({ ...state, labelActive: checked });
                                             handleLabelActive(checked);
-                                        }}> Etiketi göster</Checkbox>
+                                        }}> Show Label</Checkbox>
                                 </Tooltip>
                             </Col>
                             <Col span={10} style={styles.verticallyCenteredColStyle}>
-                                <span>Etiket Pozisyonu:</span>
+                                <span>Label position:</span>
                             </Col>
                             <Col span={14}>
                                 <Select defaultValue={labelPosition} style={{ width: "100%" }} disabled={!state.labelActive}
@@ -479,7 +478,7 @@ const Settings = ({ settingsObj, isDashboard, onSaveChartSettings, isVisible, ap
                                 </Select>
                             </Col>
                             <Col span={10} style={styles.verticallyCenteredColStyle}>
-                                <span>Yazı boyutu:</span>
+                                <span>Font size:</span>
                             </Col>
                             <Col span={14}>
                                 <Input min={8} max={32} disabled={!state.labelActive}
@@ -494,7 +493,7 @@ const Settings = ({ settingsObj, isDashboard, onSaveChartSettings, isVisible, ap
                                 />
                             </Col>
                             <Col span={10}>
-                                Yazı rengi:
+                                Font color:
                             </Col>
                             <Col span={14}>
                                 {
@@ -518,11 +517,11 @@ const Settings = ({ settingsObj, isDashboard, onSaveChartSettings, isVisible, ap
                                         settingRefs.current.settingsObj.isLabelRotate = checked;
                                         setState({ ...state, isLabelRotate: checked });
                                         handleLabelRotate(checked);
-                                    }} disabled={!state.labelActive}> Etiketi döndür</Checkbox>
+                                    }} disabled={!state.labelActive}> Rotate label</Checkbox>
                             </Col>
                         </Row>
                     </Panel>
-                    <Panel header="Lejant" key="34">
+                    <Panel header="Legend" key="34">
                         <Row gutter={[8, 8]}>
                             <Col span={24}>
                                 <Checkbox defaultChecked={state.legendActive}
@@ -531,10 +530,10 @@ const Settings = ({ settingsObj, isDashboard, onSaveChartSettings, isVisible, ap
                                         settingRefs.current.settingsObj.legendActive = checked;
                                         setState({ ...state, legendActive: checked });
                                         handleLegendActive(checked);
-                                    }}> Lejant gösterilsin</Checkbox>
+                                    }}> Show legend</Checkbox>
                             </Col>
                             <Col span={10} style={styles.verticallyCenteredColStyle}>
-                                <span>Lejant Pozisyonu:</span>
+                                <span>Legend position:</span>
                             </Col>
                             <Col span={14}>
                                 <Select defaultValue={legendPosition} style={{ width: "100%" }} disabled={!state.legendActive}
@@ -548,7 +547,7 @@ const Settings = ({ settingsObj, isDashboard, onSaveChartSettings, isVisible, ap
                                 </Select>
                             </Col>
                             <Col span={10} style={styles.verticallyCenteredColStyle}>
-                                <span>Lejant Açısı:</span>
+                                <span>Legend layout:</span>
                             </Col>
                             <Col span={14}>
                                 <Select defaultValue={legendLayout} style={{ width: "100%" }} disabled={!state.legendActive}
@@ -561,33 +560,33 @@ const Settings = ({ settingsObj, isDashboard, onSaveChartSettings, isVisible, ap
                             </Col>
                         </Row>
                     </Panel>
-                    <Panel header="İpucu" key="35">
+                    <Panel header="Tooltip" key="35">
                         <Row gutter={[8, 8]}>
                             <Col span={24}>
-                                <Tooltip title="İşaretlendiğinde grafik üzerine gelindiğinde gösterilen tooltipte veri başlığı gösterilir." mouseEnterDelay="0.1">
+                                <Tooltip title="Tooltip başlığını göster veya gizle." mouseEnterDelay="0.1">
                                     <Checkbox defaultChecked={state.isTooltipTitleActive}
                                         onChange={(event => {
                                             const { checked } = event.target;
                                             settingRefs.current.settingsObj.isTooltipTitleActive = checked;
                                             setState({ ...state, isTooltipTitleActive: checked });
                                             handleIsTooltipTitleActive(checked);
-                                        })}> İpucu başlığı gösterilsin</Checkbox>
+                                        })}> Show tooltip title</Checkbox>
                                 </Tooltip>
                             </Col>
                             <Col span={24}>
-                                <Tooltip title="İşaretlendiğinde grafik üzerine gelindiğinde gösterilen tooltipte veri başlığı gösterilir." mouseEnterDelay="0.1">
+                                <Tooltip title="Generate tooltip title automatically." mouseEnterDelay="0.1">
                                     <Checkbox defaultChecked={state.isAutoTooltipTitle}
                                         onChange={(event) => {
                                             const { checked } = event.target;
                                             settingRefs.current.settingsObj.isAutoTooltipTitle = checked;
                                             setState({ ...state, isAutoTooltipTitle: checked });
                                             handleIsAutoTooltipTitle(checked);
-                                        }} disabled={!state.isTooltipTitleActive}> İpucu başlığı otomatik oluşturulsun </Checkbox>
+                                        }} disabled={!state.isTooltipTitleActive}> Generate Auto Tooltip </Checkbox>
                                 </Tooltip>
                             </Col>
 
                             <Col span={10} style={styles.verticallyCenteredColStyle}>
-                                <span>İpucu başlığı :</span>
+                                <span>Tooltip title :</span>
                             </Col>
                             <Col span={14}>
                                 <Input defaultValue={customTooltipTitle}
@@ -622,10 +621,8 @@ const Settings = ({ settingsObj, isDashboard, onSaveChartSettings, isVisible, ap
                 headerStyle={{ border: 'none' }}
                 footer={
                     <Space>
-                        {!isDashboard && <Button type="default" onClick={(event) => {
-                            applySettings(settingRefs.current.settingsObj);
-                        }} icon={<CheckCircleOutlined />}>Uygula</Button>}
-                        {isDashboard && <Button type="default" onClick={(event) => { onSaveChartSettings(settingRefs.current.settingsObj); }} icon={<SaveOutlined />}>Kaydet</Button>}
+
+                        {<Button type="default" onClick={(event) => { onSaveChartSettings(settingRefs.current.settingsObj); }} icon={<SaveOutlined />}>Save</Button>}
                     </Space>
                 }
             >

@@ -1,8 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Button, message, Row, Col, notification, Result, Radio } from 'antd';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCog, faDownload } from '@fortawesome/free-solid-svg-icons';
-import moment from 'moment'
+import { Button, notification, } from 'antd';
+import { SettingOutlined, ExportOutlined } from "@ant-design/icons";
+
 import Settings from './Settings';
 import {
     GetChartColors, GetSliderColor, GetAxisColor, GetChartGeometry, GetGeometryOptions, ColorAddUpdate, GeomAddUpdate, CalcAverageValue
@@ -12,7 +11,6 @@ import { DataLimitCount as dataLimitCount } from './Defaults';
 
 const randomColor = require('randomcolor');
 
-const xField_with1string = "stringCol";
 const seriesField_with1numeric = "category";
 
 const initialBarConfig = {
@@ -27,12 +25,7 @@ const initialBarConfig = {
 
 
 const DynamicChart = (props) => {
-    // let { templateName, style, dataGridState, onSaveChartSettings, item, settings, isDashboard, chartName, filterCriteria, enableDownload = true, enableSettings = true } = props;
     let { data, style, chartName, settings, strKeys, numericColumns } = props;
-    // let strKeysTmp = props.strKeys;
-    // let numericColumnsTmp = props.numericColumns;
-
-
 
     // TODO CANSU TEST İÇİN EKLENDİ, SİLİNECEK
     if (settings && settings.chartType) {
@@ -43,7 +36,6 @@ const DynamicChart = (props) => {
 
     const [visible, setVisible] = useState(false);
     const [sliderColor, setSliderColor] = useState(GetSliderColor(settings));
-    const ref = useRef();
 
     const chartRefs = useRef({
         chartData: [],
@@ -52,10 +44,7 @@ const DynamicChart = (props) => {
         isInit: false, isSync: false, isChartPossible: true,
         config: { ...initialBarConfig, ...style },
         selectedChart: chartName,
-
         dataWith1Numeric: [], dataWith1String: [], numericColumnNames: [],
-
-        //numericColumns: numericColumnsTmp, strKeys: strKeysTmp, 
         strKey: null,
         strCount: 0, selectedData: [], numericColumnsFiltered: [],
         numericColumnsFormat: {},
@@ -108,7 +97,7 @@ const DynamicChart = (props) => {
 
 
     if (!settings) {
-        settings = //{ chartType: chartRefs.current.selectedChart, colNameColor: [], colNameGeom: [] }
+        settings =
         {
             chartType: chartRefs.current.selectedChart,
             categoryField: chartRefs.current.strKey,
@@ -148,9 +137,6 @@ const DynamicChart = (props) => {
             isAggregate: chartRefs.current.chartSettings.isAggregate,
         }
     }
-
-    const [isGeometryOptionsReady, setIsGeometryOptionsReady] = useState(chartRefs.current.selectedChart !== "dualAxes");
-
 
     /* CONFIG VARIABLES */
     // -- common config --
@@ -531,7 +517,6 @@ const DynamicChart = (props) => {
                     }
 
                     chartRefs.current.numericColumnNames = chartRefs.current.numericColumnsFiltered?.map(col => col.replace('.', '_'))
-
 
                     let obj = {};
                     let strCellVal = "";
@@ -922,7 +907,6 @@ const DynamicChart = (props) => {
     }
 
     useEffect(() => {
-        console.debug("useeffect...");
         const containerElement = document.getElementById("dynamicChartContainer");
         if (containerElement) {
             initChart();
@@ -932,7 +916,6 @@ const DynamicChart = (props) => {
         return () => {
             // cleanup
             // TODO CANSU BUNA GEREK KALMAYABİLİR.
-            console.log("cleanup...");
         }
         // eslint-disable-next-line
     }, []);
@@ -940,14 +923,14 @@ const DynamicChart = (props) => {
 
     return (
         <>
-            <div id="dynamicChartContainer" />
+            <div id="dynamicChartContainer" style={style} />
             <>
 
                 <Button type="default" onClick={downloadImage} style={{ marginRight: 24 }}>
-                    <FontAwesomeIcon icon={faDownload} size="lg" pull="left" />   {"downloadImg"}
+                    <ExportOutlined /> Download image
                 </Button>
                 <Button type="default" onClick={() => setVisible(true)} style={{ marginRight: 24 }}>
-                    <FontAwesomeIcon icon={faCog} size="lg" pull="left" />{"settings"}
+                    <SettingOutlined /> Settings
                 </Button>
             </>
             {
