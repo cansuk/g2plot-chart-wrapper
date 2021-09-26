@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import {
     Tabs, Drawer, Button, Select, Checkbox, Row, Col, Tooltip, Radio, Collapse, Input, Layout, Space, InputNumber
 } from 'antd';
+import uniqid from 'uniqid';
 // import i18n from '../../i18n';
 
 
@@ -41,8 +42,8 @@ const Settings = ({ settingsObj, isDashboard, onSaveChartSettings, isVisible, ap
     const { Option } = Select;
     const { Panel } = Collapse;
     const [visible, setVisible] = useState(isVisible);
-    const [currentColorColName, setCurrentColorColName] = useState(numericColumnsFiltered?.length > 0 ? numericColumnsFiltered[0].ColumnName
-        : numericColumns?.length > 0 ? numericColumns[0].ColumnName : null);
+    const [currentColorColName, setCurrentColorColName] = useState(numericColumnsFiltered?.length > 0 ? numericColumnsFiltered[0]
+        : numericColumns?.length > 0 ? numericColumns[0] : null);
 
     const [currentGeomType, setCurrentGeomType] = useState(GetChartGeometry(currentColorColName, chartObject));
     const [state, setState] = useState({
@@ -57,7 +58,7 @@ const Settings = ({ settingsObj, isDashboard, onSaveChartSettings, isVisible, ap
         {
             chartType: selectedChart,
             categoryField: strKey,
-            valField: numericColumnsFiltered?.map(x => x.ColumnName),
+            valField: numericColumnsFiltered?.map(x => x),
             selectedDataViewMode: "group",
             isGrouped: isGrouped,
             isStacked: isStacked,
@@ -128,8 +129,9 @@ const Settings = ({ settingsObj, isDashboard, onSaveChartSettings, isVisible, ap
                             settingRefs.current.settingsObj.categoryField = value;
                             handleStrFieldMenuClick(value);
                         }}>
+
                         {strColumns.map((item) => {
-                            return <Option value={item.ColumnName.replace('.', '_')}>{item.DisplayName}</Option>
+                            return <Option key={uniqid()} value={item}>{item}</Option>
                         })}
                     </Select>
                 </Col>
@@ -142,10 +144,10 @@ const Settings = ({ settingsObj, isDashboard, onSaveChartSettings, isVisible, ap
                         allowClear
                         style={{ width: '100%' }}
                         placeholder="Seçiniz"
-                        defaultValue={numericColumnsFiltered?.map(x => x.ColumnName)}
+                        defaultValue={numericColumnsFiltered?.map(x => x)}
                         onChange={(value) => { settingRefs.current.settingsObj.valField = value; handleNumFieldChange(value); }}
                     >
-                        {numericColumns?.map((item) => <Option key={item.ColumnName} value={item.ColumnName}>{item.DisplayName}</Option>)}
+                        {numericColumns?.map((item) => <Option key={uniqid()} value={item}>{item}</Option>)}
                     </Select>}
                 </Col>
 
@@ -220,14 +222,13 @@ const Settings = ({ settingsObj, isDashboard, onSaveChartSettings, isVisible, ap
                     <h3>Grafik Biçimi</h3>
                 </Col>
                 <Col span={14}>
-                    <Select defaultValue={numericColumnsFiltered?.filter(x => x.ColumnName === currentColorColName)[0]?.DisplayName} style={{ width: "100%" }}
+                    <Select defaultValue={numericColumnsFiltered?.filter(x => x === currentColorColName)[0]} style={{ width: "100%" }}
                         onSelect={(key) => {
                             setCurrentColorColName(key.replace('_', '.'));
                             setCurrentGeomType(GetChartGeometry(key.replace('_', '.'), chartObject));
                             setState({ ...state, selectedColor: GetChartColors(key.replace('_', '.'), chartObject) });
                         }}>
-                        {numericColumnsFiltered.map((col) => <Option value={col.ColumnName.replace('.', '_')}>{col.DisplayName}</Option>)}
-                        {/* {chartObject.map((col) => <Option value={col.ColumnName.replace('.', '_')}>{col.DisplayName}</Option>)} */}
+                        {numericColumnsFiltered.map((col) => <Option key={uniqid()} value={col}>{col}</Option>)}
                     </Select>
                 </Col>
                 <Col span={10} type="flex" align="right" >
@@ -236,7 +237,7 @@ const Settings = ({ settingsObj, isDashboard, onSaveChartSettings, isVisible, ap
                         onChangeComplete={(color) => {
                             setState({ ...state, selectedColor: color.hex });
                             settingRefs.current.settingsObj = ColorAddUpdate(settingRefs.current.settingsObj, currentColorColName, color.hex);
-                            let colorIndex = chartObject.findIndex(x => x["Path"] === currentColorColName);
+                            let colorIndex = chartObject.findIndex(x => x["column"] === currentColorColName);
                             chartObject[colorIndex]["color"] = color.hex;
                         }}
                     />} color="white" trigger={['click']}>

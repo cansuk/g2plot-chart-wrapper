@@ -1,20 +1,20 @@
 const randomColor = require('randomcolor');
 
 export const GetChartColors = (category, chartObj) => {
-    return chartObj?.filter(x => x.Path === category)[0]?.color || randomColor();
+    return chartObj?.filter(x => x["column"] === category)[0]?.color || randomColor();
 };
 
 export const GetSliderColor = (chartSettings) => chartSettings?.sliderColor || randomColor();
 
 export const GetAxisColor = (axisLineColorData, axis) => axisLineColorData[axis] || randomColor();
 
-export const GetChartGeometry = (category, chartObj) => chartObj?.filter(x => x.Path === category)[0]?.geomType || "line";
+export const GetChartGeometry = (category, chartObj) => chartObj?.filter(x => x["column"] === category)[0]?.geomType || "line";
 export const GetGeometryOptions = (chartObj, colNameGeom) => {
     let result = [];
     chartObj?.forEach(obj => {
 
 
-        let geomObj = colNameGeom?.filter(x => x["colName"] === obj.Path);
+        let geomObj = colNameGeom?.filter(x => x["colName"] === obj);
 
         let geom = "line";
         if (geomObj && geomObj?.length === 1 && geomObj[0]) {
@@ -23,7 +23,7 @@ export const GetGeometryOptions = (chartObj, colNameGeom) => {
 
         result.push(
             Object.assign({}, {
-                geometry: geom || GetChartGeometry(obj.Path, chartObj),
+                geometry: geom || GetChartGeometry(obj, chartObj),
                 color: obj.color, smooth: true, connectNulls: false
             })
         );
