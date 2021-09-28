@@ -1,3 +1,3 @@
-import DynamicChart from './components/DynamicChart';
+import DynamicChartClient from './components/DynamicChartClient';
 import 'antd/dist/antd.css';
-export { DynamicChart };
+export { DynamicChartClient };

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import DynamicChartClient from './demo/DynamicChartClient';
+import DynamicChartClient from './lib/components/DynamicChartClient';
 
 function App() {
   const [data, setData] = useState([]);
