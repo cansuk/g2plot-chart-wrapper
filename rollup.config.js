@@ -22,9 +22,10 @@ module.exports = [
     output: {
       file: 'dist/index.js',
       format: 'umd',
-      name: 'mychart',
+      name: 'g2plotchart',
       globals: umdGlobals,
-      sourcemap: 'inline'
+      sourcemap: 'inline',
+      indent: false
     },
 
     external: Object.keys(umdGlobals),
@@ -33,9 +34,12 @@ module.exports = [
       commonjs({ include: '**/node_modules/**' }),
       babel({ exclude: '**/node_modules/**' }),
       externalDeps(),
-      //uglify(),
+      uglify(),
       builtins(),
-      styles()
+      styles(),
+      babel({
+        exclude: 'node_modules/**',
+      }),
     ]
   }
 ]

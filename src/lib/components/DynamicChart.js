@@ -1220,7 +1220,7 @@ const DynamicChart = (props) => {
                         if (chartRefs.current.chartSettings.dataLimitCount !== 0 && rowIndex >= chartRefs.current.chartSettings.dataLimitCount)
                             return;
 
-                        strVal = chartRefs.current.chartData[rowIndex] && chartRefs.current.chartData[rowIndex][chartRefs.current.strKey?.replace('_', '.')];
+                        strVal = chartRefs.current.chartData[rowIndex] && chartRefs.current.chartData[rowIndex][chartRefs.current.strKey];
 
                         cellVal = 0;
                         if (chartRefs.current.numericColumnsFiltered?.length > 0) {
@@ -1654,7 +1654,7 @@ const DynamicChart = (props) => {
     const downloadImage = () => {
         var a = document.createElement("a");
         a.href = document.querySelectorAll('#dynamicChartContainer canvas')?.[0].toDataURL()
-        a.download = `${chartRefs.current.chartSettings.chartTitle || chartName}.jpg`; //File name 
+        a.download = `${chartRefs.current.chartSettings.chartTitle || uniqid()}.jpg`; //File name 
         a.click();
     };
 

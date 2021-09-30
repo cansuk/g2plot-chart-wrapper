@@ -50,7 +50,7 @@
     "start": "react-scripts start",
     "clean": "rimraf ./dist",
     "build": "npm run clean && npm run build:umd",
-    "build:umd": "cross-env NODE_ENV=es rollup -c",
+    "build:umd": "cross-env NODE_ENV=production rollup -c",
     "build:es": "cross-env BABEL_ENV=es babel ./src --out-dir ./dist/es --ignore '**/*.spec.js'",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

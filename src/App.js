@@ -6,7 +6,7 @@ function App() {
 
   useEffect(() => {
 
-    fetch("./data2.json").then(
+    fetch("./data3.json").then(
       function (res) {
         return res.json()
       }).then((data) => {
