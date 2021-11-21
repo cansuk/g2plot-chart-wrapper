@@ -1,4 +1,4 @@
-**[Development continue... Known bugs will be fixed soon.]** A wrapper for AntDesign G2Plot charts. Takes data as json. Binds it on charts and provides configuring settings panel on charts dynamically.
+**[Development in continue... Known bugs will be fixed soon.]** A wrapper for AntDesign G2Plot charts. Takes data as json. Binds it on charts and provides configuring settings panel on charts dynamically.
 
 
 ## 🔨 Basic usage : 
